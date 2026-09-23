@@ -68,6 +68,10 @@ if require_command curl && require_command git; then
 	run_update 'NVM' install_or_update_nvm
 fi
 
+if require_command copilot; then
+	run_update 'GitHub Copilot CLI' copilot update
+fi
+
 if require_command composer; then
 	run_update 'Composer' sudo composer self-update
 fi
