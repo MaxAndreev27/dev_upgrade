@@ -9,6 +9,7 @@ A Bash script that updates common development tools and reports the result of ea
 - Flyctl
 - Ollama
 - NVM
+- GitHub Copilot CLI
 - Composer
 - pyenv
 
@@ -23,7 +24,7 @@ chmod +x dev_upgrade.sh
 ./dev_upgrade.sh
 ```
 
-The script prints `[x]` for successful updates and `[!]` for failed or skipped ones. It exits with a non-zero status when at least one update fails or is skipped.
+The script prints `⏳` while an update is running, `✅` after a successful update, and `❌` for failed or skipped updates. It exits with a non-zero status when at least one update fails or is skipped.
 
 ## License
 
