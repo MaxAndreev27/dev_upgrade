@@ -46,6 +46,33 @@ install_or_update_nvm() {
 	curl -fsSL "https://raw.githubusercontent.com/nvm-sh/nvm/${nvm_version}/install.sh" | bash
 }
 
+install_or_update_ollama() {
+	local installed_version=''
+	local latest_release_url
+	local latest_version
+	local version_output
+
+	version_output="$(ollama --version 2>/dev/null)"
+	if [[ "$version_output" =~ ([0-9]+(\.[0-9]+)+) ]]; then
+		installed_version="${BASH_REMATCH[1]}"
+	fi
+	latest_release_url="$(curl -fsSL -o /dev/null -w '%{url_effective}' https://github.com/ollama/ollama/releases/latest)"
+	latest_version="${latest_release_url##*/v}"
+
+	if [[ ! "$latest_version" =~ ^[0-9]+(\.[0-9]+)+$ ]]; then
+		printf '❌ Could not determine the latest Ollama version\n' >&2
+		return 1
+	fi
+
+	if [[ -n "$installed_version" ]] && [[ "$(printf '%s\n%s\n' "$installed_version" "$latest_version" | sort -V | tail -n 1)" == "$installed_version" ]]; then
+		printf 'Ollama %s is already up to date\n' "$installed_version"
+		return 0
+	fi
+
+	printf 'Updating Ollama from %s to %s\n' "${installed_version:-not installed}" "$latest_version"
+	curl -fsSL https://ollama.com/install.sh | sh
+}
+
 printf 'Starting development tools update...\n'
 
 if require_command bun; then
@@ -61,7 +88,7 @@ if require_command flyctl; then
 fi
 
 if require_command curl; then
-	run_update 'Ollama' bash -o pipefail -c 'curl -fsSL https://ollama.com/install.sh | sh'
+	run_update 'Ollama' install_or_update_ollama
 fi
 
 if require_command curl && require_command git; then

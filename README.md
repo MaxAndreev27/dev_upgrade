@@ -26,6 +26,8 @@ chmod +x dev_upgrade.sh
 
 The script prints `⏳` while an update is running, `✅` after a successful update, and `❌` for failed or skipped updates. It exits with a non-zero status when at least one update fails or is skipped.
 
+Ollama is downloaded only when its GitHub release is newer than the installed version. The check uses the release redirect and does not download the release archive.
+
 ## License
 
 Distributed under the [MIT License](LICENSE).
