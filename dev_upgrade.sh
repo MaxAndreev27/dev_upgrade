@@ -9,12 +9,12 @@ run_update() {
 	local name="$1"
 	shift
 
-	printf '\n[ ] Updating %s...\n' "$name"
+	printf '\n⏳ Updating %s...\n' "$name"
 	if "$@"; then
-		printf '[x] %s updated successfully\n' "$name"
+		printf '✅ %s updated successfully\n' "$name"
 		((successful_updates++))
 	else
-		printf '[!] Failed to update %s\n' "$name" >&2
+		printf '❌ Failed to update %s\n' "$name" >&2
 		((failed_updates++))
 	fi
 }
@@ -23,7 +23,7 @@ require_command() {
 	local command_name="$1"
 
 	if ! command -v "$command_name" >/dev/null 2>&1; then
-		printf '[!] Skipping %s: command not found\n' "$command_name" >&2
+		printf '❌ Skipping %s: command not found\n' "$command_name" >&2
 		((failed_updates++))
 		return 1
 	fi
@@ -38,7 +38,7 @@ install_or_update_nvm() {
 		| tail -n 1)"
 
 	if [[ -z "$nvm_version" ]]; then
-		printf '[!] Could not determine the latest NVM version\n' >&2
+		printf '❌ Could not determine the latest NVM version\n' >&2
 		return 1
 	fi
 
@@ -76,7 +76,7 @@ if require_command pyenv; then
 	run_update 'pyenv' pyenv update
 fi
 
-printf '\nUpdate complete: [x] %d succeeded, [!] %d failed or skipped\n' \
+printf '\nUpdate complete: ✅ %d succeeded, ❌ %d failed or skipped\n' \
 	"$successful_updates" "$failed_updates"
 
 ((failed_updates == 0))
