@@ -103,8 +103,8 @@ if require_command composer; then
 	run_update 'Composer' sudo composer self-update
 fi
 
-if require_command pyenv; then
-	run_update 'pyenv' pyenv update
+if require_command curl; then
+	run_update 'uv' bash -o pipefail -c 'curl -LsSf https://astral.sh/uv/install.sh | sh'
 fi
 
 printf '\nUpdate complete: ✅ %d succeeded, ❌ %d failed or skipped\n' \

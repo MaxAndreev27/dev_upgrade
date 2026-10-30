@@ -11,7 +11,7 @@ A Bash script that updates common development tools and reports the result of ea
 - NVM
 - GitHub Copilot CLI
 - Composer
-- pyenv
+- uv
 
 ## Requirements
 
