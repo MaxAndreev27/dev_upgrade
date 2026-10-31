@@ -103,8 +103,8 @@ if require_command composer; then
 	run_update 'Composer' sudo composer self-update
 fi
 
-if require_command curl; then
-	run_update 'uv' bash -o pipefail -c 'curl -LsSf https://astral.sh/uv/install.sh | sh'
+if require_command uv; then
+	run_update 'uv' uv self update
 fi
 
 printf '\nUpdate complete: ✅ %d succeeded, ❌ %d failed or skipped\n' \
