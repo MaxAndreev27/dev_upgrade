@@ -87,6 +87,10 @@ if require_command flyctl; then
 	run_update 'Flyctl' flyctl version update
 fi
 
+if require_command opencode; then
+	run_update 'OpenCode' opencode upgrade
+fi
+
 if require_command curl; then
 	run_update 'Ollama' install_or_update_ollama
 fi

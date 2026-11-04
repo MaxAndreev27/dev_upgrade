@@ -7,6 +7,7 @@ A Bash script that updates common development tools and reports the result of ea
 - Bun packages
 - DDEV
 - Flyctl
+- OpenCode
 - Ollama
 - NVM
 - GitHub Copilot CLI
