@@ -5,6 +5,10 @@ set -uo pipefail
 successful_updates=0
 failed_updates=0
 
+# Пользовательские бинарники и mise-шимы нужны и в неинтерактивных запусках
+# (cron, systemd, CI), где ~/.zshrc и ~/.zprofile не читаются.
+export PATH="$PATH:$HOME/.local/bin:$HOME/.local/share/mise/shims"
+
 run_update() {
 	local name="$1"
 	shift
@@ -27,23 +31,6 @@ require_command() {
 		((failed_updates++))
 		return 1
 	fi
-}
-
-install_or_update_nvm() {
-	local nvm_version
-
-	nvm_version="$(git ls-remote --tags --refs https://github.com/nvm-sh/nvm.git 'v[0-9]*' \
-		| awk -F/ '{print $3}' \
-		| sort -V \
-		| tail -n 1)"
-
-	if [[ -z "$nvm_version" ]]; then
-		printf '❌ Could not determine the latest NVM version\n' >&2
-		return 1
-	fi
-
-	printf 'Using NVM release %s\n' "$nvm_version"
-	curl -fsSL "https://raw.githubusercontent.com/nvm-sh/nvm/${nvm_version}/install.sh" | bash
 }
 
 install_or_update_ollama() {
@@ -75,8 +62,16 @@ install_or_update_ollama() {
 
 printf 'Starting development tools update...\n'
 
-if require_command bun; then
-	run_update 'Bun packages' bun upgrade
+# mise: сам себя, затем все инструменты из ~/.config/mise/config.toml
+# (node, bun, pnpm, а также uv/python, если они когда-нибудь переедут под mise).
+if require_command mise; then
+	run_update 'mise' mise self-update
+	run_update 'mise tools (node, bun, pnpm)' mise upgrade --yes
+fi
+
+# bun вне mise (например, на новой машине) — обновляем его собственным способом.
+if require_command bun && [[ "$(command -v bun)" != "$HOME/.local/share/mise/"* ]]; then
+	run_update 'Bun (standalone)' bun upgrade
 fi
 
 if require_command curl; then
@@ -95,10 +90,6 @@ if require_command curl; then
 	run_update 'Ollama' install_or_update_ollama
 fi
 
-if require_command curl && require_command git; then
-	run_update 'NVM' install_or_update_nvm
-fi
-
 if require_command copilot; then
 	run_update 'GitHub Copilot CLI' copilot update
 fi
@@ -107,8 +98,13 @@ if require_command composer; then
 	run_update 'Composer' sudo composer self-update
 fi
 
+# uv пока standalone. Если позже переедет под mise — обновим через mise.
 if require_command uv; then
-	run_update 'uv' uv self update
+	if [[ "$(command -v uv)" == "$HOME/.local/share/mise/"* ]]; then
+		run_update 'uv' mise upgrade uv
+	else
+		run_update 'uv' uv self update
+	fi
 fi
 
 printf '\nUpdate complete: ✅ %d succeeded, ❌ %d failed or skipped\n' \
